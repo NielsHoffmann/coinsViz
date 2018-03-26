@@ -10,13 +10,20 @@ pg = pyyed.Graph()
 sparql = SPARQLWrapper("http://localhost:7200/repositories/imgolf")
 sparql.setReturnFormat(JSON)
 
-#nodes
-sparql.setQuery("""SELECT ?node
+target_namespace = "http://connecteddata.nl/coins/imgolf/"
+
+node_query = ("""SELECT ?node
                 WHERE {
     			?node rdfs:subClassOf+ <http://www.coinsweb.nl/cbim-2.0.rdf#Object> .
+    			FILTER(STRSTARTS(STR(?node), "%s"))
 				FILTER (!isBlank(?node))
-                }"""
-                )
+                }""") % target_namespace
+
+print(node_query)
+
+#nodes
+sparql.setQuery(node_query)
+
 nodes =  sparql.query().convert()
 for node in nodes["results"]["bindings"]:
     nodename = node["node"]["value"]
@@ -45,7 +52,7 @@ for node in nodes["results"]["bindings"]:
         else:
             attname = attname.split("/")[-1]
 
-        lbl = attname + " (" + atttype.split("#")[-1] + ") \n "
+        lbl = lbl + attname + " (" + atttype.split("#")[-1] + ") \n "
 
     try:
         if "#" in nodename:
@@ -58,13 +65,13 @@ for node in nodes["results"]["bindings"]:
         print("error adding node: " + nodename)
 
 #edges subclass rel
-sparql.setQuery("""SELECT ?subject ?object
+rel_query = ("""SELECT ?subject ?object
                 WHERE {
                 ?subject rdfs:subClassOf+ ?object .
- 	            FILTER(STRSTARTS(STR(?object), "http://connecteddata.nl/coins/imgolf/"))
+ 	            FILTER(STRSTARTS(STR(?object), "%s"))
                 FILTER(!IsBlank(?subject))
-                }"""
-                )
+                }""") % target_namespace
+sparql.setQuery(rel_query)
 
 edges = sparql.query().convert()
 for edge in edges["results"]["bindings"]:
