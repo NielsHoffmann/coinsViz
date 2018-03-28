@@ -24,3 +24,5 @@ Options:
 
 In yEd kan vervolgens vis het Layout menu de gewenste visualisatie van het diagram gekozen worden.
 Als voorbeeld bevat deze repository een tst.graphml file en een imgolf.graphml file.
+
+![imgolf](https://github.com/provincieNH/coinsViz/blob/master/imgolf.png)
